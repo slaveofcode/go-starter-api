@@ -1,0 +1,22 @@
+Users(name, city, country, avatarImg, lastLoginAt, blockedAt, verifiedAt, tz, tzOffset)
+Credentials(userId, email, password, isCurrentlyUsed)
+UserVerificationsRequest(userId, type(email_verification, forgot_password), verificationKey, requestedAt, expiredAt)
+UserVerificationAttempt(userId, userVerificationRequestId, userAgent, ipAddr)
+
+ReferralCodes(userId, code)
+ReferralUsers(referralCodeId, userId)
+
+Roles(name[owner, manager, ], scopes)
+Teams(name)
+TeamMemberInvitation(teamId, email, invitationKey)
+TeamMembers(teamId, userId, roleId, isFrozen)
+
+Invoices(userId, planType, discAmount, discPercentage, paymentType, amount, tax, totalAmount, paidAt)
+Subscriptions(userId, planType, endOfPlanAt, isAutoRenew)
+SubscriptionInvoices(subscriptionId, invoiceId)
+
+ApiConfig(userId, callLimits, refreshHourCycle, maxApiKeys)
+ApiKeys(userId, token, currentCalls, limits, lastRefreshedAt, refreshHourCycle, isFrozen)
+
+
+
