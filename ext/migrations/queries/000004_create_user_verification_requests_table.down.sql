@@ -1,1 +1,1 @@
-DROP TABLE IF EXISTS "UserVerificationsRequests";
+DROP TABLE IF EXISTS "UserVerificationRequests";

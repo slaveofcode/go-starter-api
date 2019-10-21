@@ -1,6 +1,6 @@
-CREATE TABLE IF NOT EXISTS "UserVerificationsRequests" (
+CREATE TABLE IF NOT EXISTS "UserVerificationRequests" (
    id serial PRIMARY KEY,
-   userId INTEGER NOT NULL REFERENCES "Users"(id),
+   "userId" INTEGER NOT NULL REFERENCES "Users"(id),
    type VARCHAR(30) NOT NULL,
    "verificationKey" VARCHAR(100) NOT NULL,
    "requestedAt" TIMESTAMP WITH TIME ZONE NOT NULL,
@@ -9,11 +9,11 @@ CREATE TABLE IF NOT EXISTS "UserVerificationsRequests" (
    "DeletedAt" TIMESTAMP WITH TIME ZONE NULL
 );
 
-CREATE INDEX "userId_idx" ON "UserVerificationsRequests" ("userId");
-CREATE INDEX type_idx ON "UserVerificationsRequests" (type);
-CREATE INDEX "verificationKey" ON "UserVerificationsRequests" ("verificationKey");
-CREATE INDEX "requestedAt" ON "UserVerificationsRequests" ("requestedAt");
+CREATE INDEX "UserVerificationRequests_userId_idx" ON "UserVerificationRequests" ("userId");
+CREATE INDEX "UserVerificationRequests_type_idx" ON "UserVerificationRequests" (type);
+CREATE INDEX "UserVerificationRequests_verificationKey_idx" ON "UserVerificationRequests" ("verificationKey");
+CREATE INDEX "UserVerificationRequests_requestedAt_idx" ON "UserVerificationRequests" ("requestedAt");
 
-CREATE INDEX "CreatedAt_idx" ON "Credentials" ("CreatedAt");
-CREATE INDEX "UpdatedAt_idx" ON "Credentials" ("UpdatedAt");
-CREATE INDEX "DeletedAt_idx" ON "Credentials" ("DeletedAt");
+CREATE INDEX "UserVerificationRequests_CreatedAt_idx" ON "UserVerificationRequests" ("CreatedAt");
+CREATE INDEX "UserVerificationRequests_UpdatedAt_idx" ON "UserVerificationRequests" ("UpdatedAt");
+CREATE INDEX "UserVerificationRequests_DeletedAt_idx" ON "UserVerificationRequests" ("DeletedAt");
