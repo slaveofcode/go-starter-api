@@ -28,7 +28,13 @@ func main() {
 		panic("Please define port number!")
 	}
 
-	log.Fatalln(
-		fasthttp.ListenAndServe(":"+port, middleware.CORS(route.New().Handler)),
-	)
+	svr := &fasthttp.Server{
+		Handler:      middleware.CORS(route.New().Handler),
+		LogAllErrors: true,
+		Logger:       log,
+	}
+
+	if err := svr.ListenAndServe(":" + port); err != nil {
+		log.Fatalf("error in ListenAndServe: %s", err)
+	}
 }
