@@ -9,6 +9,9 @@ import (
 func New() *router.Router {
 	router := router.New()
 
+	router.NotFound = NotFoundHandler
+	router.PanicHandler = PanicHandler
+
 	router.GET("/", handlers.Pinger)
 
 	return router
