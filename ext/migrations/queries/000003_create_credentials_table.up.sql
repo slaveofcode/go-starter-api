@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS "Credentials" (
    "isCurrentlyUsed" BOOLEAN NOT NULL DEFAULT false,
    "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL,
    "UpdatedAt" TIMESTAMP WITH TIME ZONE NOT NULL,
-   "DeletedAt" TIMESTAMP WITH TIME ZONE NOT NULL
+   "DeletedAt" TIMESTAMP WITH TIME ZONE NULL
 );
 
 CREATE INDEX "userId_idx" ON "Credentials" ("userId");
