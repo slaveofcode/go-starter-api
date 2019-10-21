@@ -8,9 +8,7 @@ import (
 
 // Pinger send ping result as server running indication
 func Pinger(ctx *fasthttp.RequestCtx) {
-	ctx.SetContentType("application/json")
-	ctx.SetStatusCode(fasthttp.StatusOK)
-
+	panic("Error Here from Panic")
 	res := struct {
 		Status string `json:"status"`
 		Live   bool   `json:"isAlive"`
@@ -20,6 +18,7 @@ func Pinger(ctx *fasthttp.RequestCtx) {
 	}
 	resJSON, _ := json.Marshal(res)
 
-	ctx.SetStatusCode(200)
+	ctx.SetContentType("application/json")
+	ctx.SetStatusCode(fasthttp.StatusOK)
 	ctx.SetBody(resJSON)
 }
