@@ -12,7 +12,7 @@ TeamMemberInvitation(teamId, email, invitationKey)
 TeamMembers(teamId, userId, roleId, isFrozen)
 
 Invoices(userId, planType, discAmount, discPercentage, paymentType, amount, tax, totalAmount, paidAt)
-Subscriptions(userId, planType, endOfPlanAt, isAutoRenew)
+Subscriptions(userId, planType, endOfPlanAt, isRecurring)
 SubscriptionInvoices(subscriptionId, invoiceId)
 
 ApiConfig(userId, callLimits, refreshHourCycle, maxApiKeys)
