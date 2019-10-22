@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS "Roles" (
    "DeletedAt" TIMESTAMP WITH TIME ZONE NULL
 );
 
+CREATE INDEX "Roles_name_idx" ON "Roles" ("name");
 CREATE INDEX "Roles_scopes_idx" ON "Roles" ("scopes");
 
 CREATE INDEX "Roles_CreatedAt_idx" ON "Roles" ("CreatedAt");
