@@ -4,6 +4,7 @@ go 1.12
 
 require (
 	github.com/fasthttp/router v0.5.1
+	github.com/jinzhu/gorm v1.9.11
 	github.com/joho/godotenv v1.3.0
 	github.com/klauspost/compress v1.8.6 // indirect
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
