@@ -1,0 +1,2 @@
+INSERT INTO "Users" (name, city, country, "avatarImgURL", timezone, "timezoneOffset", "CreatedAt", "UpdatedAt")
+VALUES('Aditya', 'Jakarta', 'Indonesia', 'https://i.stack.imgur.com/Xwvhr.jpg', 'Asia/Jakarta', '+7', now(), now());
