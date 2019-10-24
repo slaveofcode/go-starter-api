@@ -23,3 +23,5 @@ This minimal Go project was built to help you get started with a minimum setup a
 ### Create New Migration
 ### Running UP
 ### Running DOWN
+
+TODO: Create models
