@@ -2,7 +2,10 @@ package main
 
 import (
 	"os"
+	"strconv"
 
+	"github.com/fasthttp/session"
+	"github.com/fasthttp/session/redis"
 	"github.com/joho/godotenv"
 	"github.com/slaveofcode/go-starter-api/logger"
 	"github.com/slaveofcode/go-starter-api/middleware"
@@ -13,6 +16,25 @@ import (
 
 var log = logger.New()
 
+var sess = session.New(session.NewDefaultConfig())
+
+func init() {
+	loadEnv()
+	// Session
+	redisPort, _ := strconv.ParseInt(os.Getenv("REDIS_PORT"), 10, 64)
+	sessCfg := &redis.Config{
+		Host:        os.Getenv("REDIS_HOST"),
+		Port:        redisPort,
+		PoolSize:    8,
+		IdleTimeout: 300,
+		KeyPrefix:   "sess",
+	}
+	err := sess.SetProvider("redis", sessCfg)
+	if err != nil {
+		log.Errorln("Unable to intialize sesion with redis: ", err.Error())
+	}
+}
+
 func loadEnv() {
 	err := godotenv.Load()
 	if err != nil {
@@ -22,13 +44,14 @@ func loadEnv() {
 }
 
 func main() {
-	loadEnv()
+	// loadEnv()
 	port := os.Getenv("PORT")
 
 	if port == "" {
 		panic("Please define port number!")
 	}
 
+	// Database initialization
 	db := pg.NewConnection()
 	defer db.Close()
 
