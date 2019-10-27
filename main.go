@@ -1,17 +1,18 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 
 	"github.com/fasthttp/session"
 	"github.com/fasthttp/session/redis"
 	"github.com/joho/godotenv"
+	"github.com/slaveofcode/go-starter-api/context"
 	"github.com/slaveofcode/go-starter-api/logger"
 	"github.com/slaveofcode/go-starter-api/middleware"
 	"github.com/slaveofcode/go-starter-api/repository/pg"
 	"github.com/slaveofcode/go-starter-api/route"
-	"github.com/slaveofcode/go-starter-api/context"
 	"github.com/valyala/fasthttp"
 )
 
@@ -33,8 +34,9 @@ func init() {
 	}
 	err := sess.SetProvider("redis", sessCfg)
 	if err != nil {
-		log.Errorln("Unable to intialize sesion with redis: ", err.Error())
+		fmt.Println("Unable to intialize sesion with redis: ", err.Error())
 	}
+	fmt.Println("Session initialized...")
 }
 
 func loadEnv() {
@@ -42,9 +44,7 @@ func loadEnv() {
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
-
 }
-
 
 func main() {
 	port := os.Getenv("PORT")

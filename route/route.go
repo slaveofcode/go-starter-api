@@ -3,6 +3,7 @@ package route
 import (
 	"github.com/fasthttp/router"
 	"github.com/slaveofcode/go-starter-api/handlers"
+	"github.com/slaveofcode/go-starter-api/handlers/user"
 	"github.com/slaveofcode/go-starter-api/context"
 )
 
@@ -15,7 +16,7 @@ func New(appCtx *context.AppContext) *router.Router {
 
 	router.GET("/", handlers.Pinger)
 
-	userHandlers := handlers.NewUser(appCtx)
+	userHandlers := user.NewUser(appCtx)
 	router.GET("/users", userHandlers.List)
 
 	return router

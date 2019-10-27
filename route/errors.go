@@ -1,9 +1,8 @@
 package route
 
 import (
-	"encoding/json"
-
 	log "github.com/sirupsen/logrus"
+	"github.com/slaveofcode/go-starter-api/lib/httpresponse"
 	"github.com/valyala/fasthttp"
 )
 
@@ -15,28 +14,18 @@ type ErrorResponse struct {
 
 // NotFoundHandler will used as 404 handler
 func NotFoundHandler(ctx *fasthttp.RequestCtx) {
-	res := ErrorResponse{
+	httpresponse.JSON(ctx, &ErrorResponse{
 		Error:   "NotFound",
 		Message: "Requested resource are not found",
-	}
-	resJSON, _ := json.Marshal(res)
-
-	ctx.SetContentType("application/json")
-	ctx.SetStatusCode(fasthttp.StatusInternalServerError)
-	ctx.SetBody(resJSON)
+	}, fasthttp.StatusNotFound)
 }
 
 // PanicHandler will used as panic handler
 func PanicHandler(ctx *fasthttp.RequestCtx, err interface{}) {
 	log.Error("Panic Error: ", err)
 	log.Error("URI: ", ctx.Request.URI())
-	res := ErrorResponse{
+	httpresponse.JSON(ctx, &ErrorResponse{
 		Error:   "FatalError",
 		Message: "Fatal error reached",
-	}
-	resJSON, _ := json.Marshal(res)
-
-	ctx.SetContentType("application/json")
-	ctx.SetStatusCode(fasthttp.StatusInternalServerError)
-	ctx.SetBody(resJSON)
+	}, fasthttp.StatusInternalServerError)
 }
