@@ -13,7 +13,7 @@ type User struct {
 	Name           string
 	City           string
 	Country        string
-	AvatarImgURL   string     `gorm:"column:avatarImgUrl"`
+	AvatarImgURL   string     `gorm:"column:avatarImgURL"`
 	LastLoginAt    *time.Time `gorm:"column:lastLoginAt" sql:"index"`
 	BlockedAt      *time.Time `gorm:"column:blockedAt" sql:"index"`
 	VerifiedAt     *time.Time `gorm:"column:verifiedAt" sql:"index"`

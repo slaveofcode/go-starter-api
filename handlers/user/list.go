@@ -6,6 +6,11 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
+type listResponse struct {
+	Items []models.User `json:"items"`
+	Total int           `json:"total"`
+}
+
 // List returns list of users
 func (u User) List(ctx *fasthttp.RequestCtx) {
 	var entities []models.User
