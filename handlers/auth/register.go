@@ -31,7 +31,11 @@ func (auth Auth) Register(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	// check existing data
+	if param.Password != param.CPassword {
+		httpresponse.JSONErr(ctx, "Password doesn't match", fasthttp.StatusBadRequest)
+		return
+	}
+
 	var credential models.Credential
 	if auth.appCtx.DB.Where(&models.Credential{
 		Email: param.Email,
