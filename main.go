@@ -11,11 +11,13 @@ import (
 	"github.com/slaveofcode/go-starter-api/middleware"
 	"github.com/slaveofcode/go-starter-api/repository/pg"
 	"github.com/slaveofcode/go-starter-api/route"
+	"github.com/slaveofcode/go-starter-api/context"
 	"github.com/valyala/fasthttp"
 )
 
 var log = logger.New()
 
+// sess handles the user session
 var sess = session.New(session.NewDefaultConfig())
 
 func init() {
@@ -43,8 +45,8 @@ func loadEnv() {
 
 }
 
+
 func main() {
-	// loadEnv()
 	port := os.Getenv("PORT")
 
 	if port == "" {
@@ -56,7 +58,10 @@ func main() {
 	defer db.Close()
 
 	svr := &fasthttp.Server{
-		Handler:      middleware.CORS(route.New(db).Handler),
+		Handler: middleware.CORS(route.New(&context.AppContext{
+			DB:       db,
+			Sesssion: sess,
+		}).Handler),
 		LogAllErrors: true,
 		Logger:       log,
 	}

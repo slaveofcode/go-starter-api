@@ -3,14 +3,14 @@ package handlers
 import (
 	"encoding/json"
 
-	"github.com/jinzhu/gorm"
 	"github.com/slaveofcode/go-starter-api/repository/pg/models"
+	"github.com/slaveofcode/go-starter-api/context"
 	"github.com/valyala/fasthttp"
 )
 
 // User class
 type User struct {
-	db *gorm.DB
+	appCtx *context.AppContext
 }
 
 type listResponse struct {
@@ -35,7 +35,7 @@ func (u User) List(ctx *fasthttp.RequestCtx) {
 		limit = limitQuery
 	}
 
-	u.db.Limit(limit).
+	u.appCtx.DB.Limit(limit).
 		Offset(offset).
 		Order("\"CreatedAt\" DESC").
 		Find(&entities).
@@ -55,8 +55,8 @@ func (u User) List(ctx *fasthttp.RequestCtx) {
 }
 
 // NewUser create new user instance
-func NewUser(db *gorm.DB) *User {
+func NewUser(appCtx *context.AppContext) *User {
 	return &User{
-		db: db,
+		appCtx: appCtx,
 	}
 }

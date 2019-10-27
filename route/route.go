@@ -2,12 +2,12 @@ package route
 
 import (
 	"github.com/fasthttp/router"
-	"github.com/jinzhu/gorm"
 	"github.com/slaveofcode/go-starter-api/handlers"
+	"github.com/slaveofcode/go-starter-api/context"
 )
 
 // New route creation
-func New(db *gorm.DB) *router.Router {
+func New(appCtx *context.AppContext) *router.Router {
 	router := router.New()
 
 	router.NotFound = NotFoundHandler
@@ -15,7 +15,7 @@ func New(db *gorm.DB) *router.Router {
 
 	router.GET("/", handlers.Pinger)
 
-	userHandlers := handlers.NewUser(db)
+	userHandlers := handlers.NewUser(appCtx)
 	router.GET("/users", userHandlers.List)
 
 	return router
