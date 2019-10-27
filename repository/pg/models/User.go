@@ -49,7 +49,6 @@ func (u User) AfterFind() (err error) {
 
 	loc := time.FixedZone("", int(tz))
 
-	log.Info(u.LastLoginAt)
 	u.LastLoginAt = u.convertNonEmptyTime(u.LastLoginAt, loc)
 	u.BlockedAt = u.convertNonEmptyTime(u.BlockedAt, loc)
 	u.VerifiedAt = u.convertNonEmptyTime(u.VerifiedAt, loc)
