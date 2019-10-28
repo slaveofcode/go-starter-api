@@ -9,13 +9,15 @@ import (
 	"github.com/slaveofcode/go-starter-api/lib/random"
 	"github.com/slaveofcode/go-starter-api/repository/pg/models"
 	"github.com/valyala/fasthttp"
+
+	validator "gopkg.in/go-playground/validator.v9"
 )
 
 type registerBodyParam struct {
-	Name      string `json:"name"`
-	Email     string `json:"email"`
-	Password  string `json:"password"`
-	CPassword string `json:"cpassword"`
+	Name      string `json:"name" validate:"required"`
+	Email     string `json:"email" validate:"required,email"`
+	Password  string `json:"password" validate:"required"`
+	CPassword string `json:"cpassword" validate:"required"`
 }
 
 type registerResponse struct {
@@ -23,11 +25,17 @@ type registerResponse struct {
 
 // Register handles user registration
 func (auth Auth) Register(ctx *fasthttp.RequestCtx) {
-	// get data
 	var param registerBodyParam
 	err := json.Unmarshal(ctx.PostBody(), &param)
 	if err != nil {
-		httpresponse.JSONErr(ctx, "Wrong post data", fasthttp.StatusBadRequest)
+		httpresponse.JSONErr(ctx, "Wrong post data: "+err.Error(), fasthttp.StatusBadRequest)
+		return
+	}
+
+	v := validator.New()
+	err = v.Struct(param)
+	if err != nil {
+		httpresponse.JSONErr(ctx, "Invalid post data: "+err.Error(), fasthttp.StatusBadRequest)
 		return
 	}
 
