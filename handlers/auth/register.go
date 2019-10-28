@@ -20,9 +20,6 @@ type registerBodyParam struct {
 	CPassword string `json:"cpassword" validate:"required"`
 }
 
-type registerResponse struct {
-}
-
 // Register handles user registration
 func (auth Auth) Register(ctx *fasthttp.RequestCtx) {
 	var param registerBodyParam
