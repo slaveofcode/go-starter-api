@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/jinzhu/gorm"
+	"github.com/matcornic/hermes"
 	"github.com/sirupsen/logrus"
 	"github.com/slaveofcode/go-starter-api/lib/httpresponse"
 	"github.com/slaveofcode/go-starter-api/lib/mail"
@@ -46,6 +47,11 @@ func (auth Auth) ForgotPassword(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
+	var user models.User
+	db.Model(&cred).Related(&user)
+
+	logrus.Info(user.Name)
+
 	var resetCred models.ResetCredential
 	if db.Where(&models.ResetCredential{
 		CredentialID: cred.ID,
@@ -57,7 +63,7 @@ func (auth Auth) ForgotPassword(ctx *fasthttp.RequestCtx) {
 			return
 		}
 
-		sendEmail(cred.Email, rec.ResetToken)
+		sendEmail(user.Name, cred.Email, rec.ResetToken)
 
 		httpresponse.JSONOk(ctx, fasthttp.StatusOK)
 		return
@@ -82,7 +88,7 @@ func (auth Auth) ForgotPassword(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	sendEmail(cred.Email, rec.ResetToken)
+	sendEmail(user.Name, cred.Email, rec.ResetToken)
 
 	httpresponse.JSONOk(ctx, fasthttp.StatusOK)
 	return
@@ -104,15 +110,66 @@ func createResetCredential(db *gorm.DB, cred *models.Credential) (*models.ResetC
 	return &reset, nil
 }
 
-func sendEmail(email, token string) error {
+func generateMailTpl(name, token string) (string, string) {
+	h := hermes.Hermes{
+		// Optional Theme
+		// Theme: new(Default)
+		Product: hermes.Product{
+			// Appears in header & footer of e-mails
+			Name: "Ayok.be",
+			Link: "https://ayok.be/",
+			// Optional product logo
+			Logo: "http://www.duchess-france.org/wp-content/uploads/2016/01/gopher.png",
+		},
+	}
+
+	email := hermes.Email{
+		Body: hermes.Body{
+			Name: name,
+			Intros: []string{
+				"Hi " + name + "! Let's reset your password.",
+			},
+			Actions: []hermes.Action{
+				{
+					Instructions: "To reset your password, please click here:",
+					Button: hermes.Button{
+						Color: "#22BC66", // Optional action button color
+						Text:  "Reset My Password",
+						Link:  "https://ayok.be/reset?token=" + token,
+					},
+				},
+			},
+			Outros: []string{
+				"Need help, or have questions? Just reply to this email, we'd love to help.",
+			},
+		},
+	}
+
+	// Generate an HTML email with the provided contents (for modern clients)
+	emailBody, err := h.GenerateHTML(email)
+	if err != nil {
+		panic(err) // Tip: Handle error with something else than a panic ;)
+	}
+
+	// Generate the plaintext version of the e-mail (for clients that do not support xHTML)
+	emailText, err := h.GeneratePlainText(email)
+	if err != nil {
+		panic(err) // Tip: Handle error with something else than a panic ;)
+	}
+
+	return emailBody, emailText
+}
+
+func sendEmail(name, email, token string) error {
+	msgHTML, msgText := generateMailTpl(name, token)
 	out, err := mail.Send(&mail.Template{
 		From: os.Getenv("SES_FROM_EMAIL"),
 		Recipients: []*string{
 			&email,
 		},
 		Subject: "Reset Password Account",
-		HTML:    "<h1>Reset Password</h1><p>token" + token + "</p>",
-		Text:    "Reset Password\r\nToken: " + token,
+		HTML:    msgHTML,
+		Text:    msgText,
 	})
 
 	logrus.Info(out)

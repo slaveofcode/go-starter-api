@@ -20,6 +20,7 @@ require (
 	github.com/klauspost/compress v1.9.0 // indirect
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/leodido/go-urn v1.2.0 // indirect
+	github.com/matcornic/hermes v1.2.0
 	github.com/matcornic/hermes/v2 v2.0.2 // indirect
 	github.com/mattn/go-runewidth v0.0.5 // indirect
 	github.com/mitchellh/copystructure v1.0.0 // indirect
@@ -34,5 +35,6 @@ require (
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 	gopkg.in/go-playground/validator.v9 v9.30.0
+	gopkg.in/russross/blackfriday.v2 v2.0.0 // indirect
 	gopkg.in/yaml.v2 v2.2.4 // indirect
 )
