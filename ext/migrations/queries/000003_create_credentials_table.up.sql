@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS "Credentials" (
    id serial PRIMARY KEY,
    "userId" INTEGER NOT NULL REFERENCES "Users"(id),
-   email VARCHAR(60) NOT NULL,
+   email VARCHAR(60) UNIQUE NOT NULL,
    password VARCHAR(100) NOT NULL,
    "isCurrentlyUsed" BOOLEAN NOT NULL DEFAULT false,
    "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL,

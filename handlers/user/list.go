@@ -1,17 +1,10 @@
-package handlers
+package user
 
 import (
-	"encoding/json"
-
+	"github.com/slaveofcode/go-starter-api/lib/httpresponse"
 	"github.com/slaveofcode/go-starter-api/repository/pg/models"
-	"github.com/slaveofcode/go-starter-api/context"
 	"github.com/valyala/fasthttp"
 )
-
-// User class
-type User struct {
-	appCtx *context.AppContext
-}
 
 type listResponse struct {
 	Items []models.User `json:"items"`
@@ -23,7 +16,7 @@ func (u User) List(ctx *fasthttp.RequestCtx) {
 	var entities []models.User
 	var total int
 	offset := 0
-	limit := 20
+	var limit int64 = 20
 
 	offsetQuery := ctx.QueryArgs().GetUintOrZero("offset")
 	if offsetQuery != 0 {
@@ -32,8 +25,15 @@ func (u User) List(ctx *fasthttp.RequestCtx) {
 
 	limitQuery := ctx.QueryArgs().GetUintOrZero("limit")
 	if limitQuery != 0 {
-		limit = limitQuery
+		limit = int64(limitQuery)
 	}
+
+	store, err := u.appCtx.Sesssion.Get(ctx)
+	if err != nil {
+		ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
+		return
+	}
+	defer u.appCtx.Sesssion.Save(ctx, store)
 
 	u.appCtx.DB.Limit(limit).
 		Offset(offset).
@@ -43,20 +43,9 @@ func (u User) List(ctx *fasthttp.RequestCtx) {
 		Limit(-1).
 		Count(&total)
 
-	resUser, _ := json.Marshal(&listResponse{
+	httpresponse.JSON(ctx, &listResponse{
 		Items: entities,
 		Total: total,
-	})
-
-	ctx.SetContentType("application/json")
-	ctx.SetStatusCode(fasthttp.StatusOK)
-	ctx.SetBody(resUser)
+	}, fasthttp.StatusOK)
 	return
-}
-
-// NewUser create new user instance
-func NewUser(appCtx *context.AppContext) *User {
-	return &User{
-		appCtx: appCtx,
-	}
 }
