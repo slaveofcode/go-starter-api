@@ -7,8 +7,28 @@ import (
 
 // Logout handles user logout action and clearing the login session
 func (auth Auth) Logout(ctx *fasthttp.RequestCtx) {
-	// check login sessino
-	// remove the session
-	// redirect to home
-	httpresponse.JSON(ctx, nil, fasthttp.StatusOK)
+	store, err := auth.appCtx.Sesssion.Get(ctx)
+
+	if err != nil {
+		ctx.Error("Internal server error: "+err.Error(), fasthttp.StatusInternalServerError)
+		return
+	}
+
+	defer auth.appCtx.Sesssion.Save(ctx, store)
+
+	existingSess, err := getSessionAuth(store)
+
+	if err != nil {
+		ctx.Error("Internal server error: "+err.Error(), fasthttp.StatusInternalServerError)
+		return
+	}
+
+	if existingSess != nil {
+		store.Delete("auth")
+		httpresponse.JSON(ctx, nil, fasthttp.StatusOK)
+		return
+	}
+
+	httpresponse.JSONFail(ctx, fasthttp.StatusBadRequest)
+	return
 }
