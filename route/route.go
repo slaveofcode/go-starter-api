@@ -22,6 +22,7 @@ func New(appCtx *context.AppContext) *router.Router {
 	router.POST("/auth/register", authHandlers.Register)
 	router.POST("/auth/verify", authHandlers.Verify)
 	router.POST("/auth/forgot", authHandlers.ForgotPassword)
+	router.POST("/auth/reset_check", authHandlers.ResetPasswordCheck)
 	router.POST("/auth/reset", authHandlers.ResetPassword)
 	router.POST("/auth/login", authHandlers.Login)
 	router.POST("/auth/logout", authHandlers.Logout)

@@ -6,8 +6,9 @@ import (
 
 // ResetCredential model gorm
 type ResetCredential struct {
-	ID           uint       `gorm:"primary_key"`
-	CredentialID uint       `gorm:"column:credentialId" sql:"index"`
+	ID           uint `gorm:"primary_key"`
+	CredentialID uint `gorm:"column:credentialId" sql:"index"`
+	Credential   Credential
 	ResetToken   string     `gorm:"column:resetToken" sql:"index"`
 	ValidUntil   time.Time  `gorm:"column:validUntil" sql:"index"`
 	ValidatedAt  *time.Time `gorm:"column:validatedAt" sql:"index"`

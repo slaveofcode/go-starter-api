@@ -25,7 +25,7 @@ func (auth Auth) Logout(ctx *fasthttp.RequestCtx) {
 
 	if existingSess != nil {
 		store.Delete("auth")
-		httpresponse.JSON(ctx, nil, fasthttp.StatusOK)
+		httpresponse.JSONOk(ctx, fasthttp.StatusOK)
 		return
 	}
 

@@ -6,8 +6,9 @@ import (
 
 // Credential model gorm
 type Credential struct {
-	ID        uint       `gorm:"primary_key"`
-	UserID    uint       `gorm:"column:userId" sql:"index"`
+	ID        uint `gorm:"primary_key"`
+	UserID    uint `gorm:"column:userId" sql:"index"`
+	User      User
 	Email     string     `gorm:"column:email" sql:"index"`
 	Password  string     `gorm:"column:password" sql:"index"`
 	CreatedAt time.Time  `gorm:"column:CreatedAt" sql:"index"`
