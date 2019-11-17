@@ -6,7 +6,7 @@ UserVerificationAttempt(userId, userVerificationRequestId, userAgent, ipAddr)
 ReferralCodes(userId, code)
 ReferralUsers(referralCodeId, userId)
 
-Roles(name[owner, manager, ], scopes)
+Roles(name[owner, manager, staff], scopes)
 Teams(name)
 TeamMemberInvitation(teamId, email, invitationKey)
 TeamMembers(teamId, userId, roleId, isFrozen)

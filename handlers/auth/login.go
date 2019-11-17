@@ -2,13 +2,12 @@ package auth
 
 import (
 	"encoding/json"
-	"fmt"
 	"time"
 
-	"github.com/fasthttp/session"
 	"github.com/sirupsen/logrus"
 	"github.com/slaveofcode/go-starter-api/lib/httpresponse"
 	"github.com/slaveofcode/go-starter-api/lib/password"
+	authSession "github.com/slaveofcode/go-starter-api/lib/session"
 	"github.com/slaveofcode/go-starter-api/repository/pg/models"
 	"github.com/valyala/fasthttp"
 	validator "gopkg.in/go-playground/validator.v9"
@@ -17,14 +16,6 @@ import (
 type loginBodyParam struct {
 	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password" validate:"required"`
-}
-
-// SessionData wrapper data for login session
-type SessionData struct {
-	UserID    uint      `json:"userId"`
-	Name      string    `json:"name"`
-	Email     string    `json:"email"`
-	LoginTime time.Time `json:"loginTime"`
 }
 
 // Login handle login user and creates the session
@@ -39,7 +30,7 @@ func (auth Auth) Login(ctx *fasthttp.RequestCtx) {
 
 	defer auth.appCtx.Sesssion.Save(ctx, store)
 
-	existingSess, err := getSessionAuth(store)
+	existingSess, err := authSession.GetAuth(store)
 
 	if err != nil {
 		ctx.Error("Internal server error: "+err.Error(), fasthttp.StatusInternalServerError)
@@ -53,7 +44,7 @@ func (auth Auth) Login(ctx *fasthttp.RequestCtx) {
 	}
 
 	if existingSess != nil {
-		userSess := existingSess.(SessionData)
+		userSess := existingSess.(authSession.Data)
 		if userSess.UserID != 0 {
 			httpresponse.JSONOk(ctx, fasthttp.StatusOK)
 			return
@@ -94,7 +85,7 @@ func (auth Auth) Login(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	err = setSessionAuth(store, &SessionData{
+	err = authSession.SetAuth(store, &authSession.Data{
 		UserID:    cred.UserID,
 		Name:      user.Name,
 		Email:     cred.Email,
@@ -108,34 +99,4 @@ func (auth Auth) Login(ctx *fasthttp.RequestCtx) {
 
 	httpresponse.JSONOk(ctx, fasthttp.StatusOK)
 	return
-}
-
-func setSessionAuth(store session.Storer, data *SessionData) error {
-	bytes, err := json.Marshal(data)
-	if err != nil {
-		return err
-	}
-	store.Set("auth", string(bytes))
-	return nil
-}
-
-func getSessionAuth(store session.Storer) (interface{}, error) {
-	authData := store.Get("auth")
-
-	if authData != nil {
-		str := fmt.Sprintf("%v", authData)
-		bytes := []byte(str)
-
-		var data SessionData
-
-		err := json.Unmarshal(bytes, &data)
-
-		if err != nil {
-			return nil, err
-		}
-
-		return data, nil
-	}
-
-	return authData, nil
 }

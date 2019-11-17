@@ -6,8 +6,9 @@ import (
 
 // ReferralCode model gorm
 type ReferralCode struct {
-	ID        uint       `gorm:"primary_key"`
-	UserID    uint       `gorm:"column:userId" sql:"index"`
+	ID        uint `gorm:"primary_key"`
+	UserID    uint `gorm:"column:userId" sql:"index"`
+	User      User
 	Code      string     `gorm:"column:code" sql:"index"`
 	CreatedAt time.Time  `gorm:"column:CreatedAt" sql:"index"`
 	UpdatedAt time.Time  `gorm:"column:UpdatedAt" sql:"index"`

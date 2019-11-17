@@ -28,6 +28,7 @@ require (
 	github.com/savsgio/dictpool v0.0.0-20190916070935-7191e89e8098 // indirect
 	github.com/savsgio/gotils v0.0.0-20190925070755-524bc4f47500 // indirect
 	github.com/sirupsen/logrus v1.4.2
+	github.com/speps/go-hashids v2.0.0+incompatible
 	github.com/valyala/fasthttp v1.5.0
 	golang.org/x/crypto v0.0.0-20191029031824-8986dd9e96cf
 	golang.org/x/net v0.0.0-20191101175033-0deb6923b6d9 // indirect
