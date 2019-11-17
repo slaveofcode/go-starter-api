@@ -1,0 +1,2 @@
+INSERT INTO "Roles" (name, scopes, "CreatedAt", "UpdatedAt")
+VALUES('Owner', '{"team:read","team:write","invoice:read","invoice:write","subscription:read","subscription:write","apikey:read","apikey:write"}', now(), now());
