@@ -2,6 +2,7 @@ package auth
 
 import (
 	"github.com/slaveofcode/go-starter-api/lib/httpresponse"
+	"github.com/slaveofcode/go-starter-api/lib/session"
 	"github.com/valyala/fasthttp"
 )
 
@@ -16,7 +17,7 @@ func (auth Auth) Logout(ctx *fasthttp.RequestCtx) {
 
 	defer auth.appCtx.Sesssion.Save(ctx, store)
 
-	existingSess, err := getSessionAuth(store)
+	existingSess, err := session.GetAuth(store)
 
 	if err != nil {
 		ctx.Error("Internal server error: "+err.Error(), fasthttp.StatusInternalServerError)

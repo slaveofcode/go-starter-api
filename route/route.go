@@ -6,6 +6,7 @@ import (
 	"github.com/slaveofcode/go-starter-api/handlers"
 	"github.com/slaveofcode/go-starter-api/handlers/auth"
 	"github.com/slaveofcode/go-starter-api/handlers/user"
+	"github.com/slaveofcode/go-starter-api/middleware"
 )
 
 // New route creation
@@ -30,6 +31,9 @@ func New(appCtx *context.AppContext) *router.Router {
 	// User Handlers
 	userHandlers := user.NewUser(appCtx)
 	router.GET("/users", userHandlers.List)
+	router.POST("/users/make-referral-code",
+		middleware.AuthenticatedUser(appCtx, userHandlers.MakeReferral),
+	)
 
 	return router
 }

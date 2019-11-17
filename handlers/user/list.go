@@ -28,13 +28,6 @@ func (u User) List(ctx *fasthttp.RequestCtx) {
 		limit = int64(limitQuery)
 	}
 
-	store, err := u.appCtx.Sesssion.Get(ctx)
-	if err != nil {
-		ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
-		return
-	}
-	defer u.appCtx.Sesssion.Save(ctx, store)
-
 	u.appCtx.DB.Limit(limit).
 		Offset(offset).
 		Order("\"CreatedAt\" DESC").

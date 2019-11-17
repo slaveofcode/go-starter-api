@@ -2,6 +2,7 @@ package auth
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/jinzhu/gorm"
 	"github.com/slaveofcode/go-starter-api/lib/httpresponse"
@@ -14,10 +15,11 @@ import (
 )
 
 type registerBodyParam struct {
-	Name      string `json:"name" validate:"required"`
-	Email     string `json:"email" validate:"required,email"`
-	Password  string `json:"password" validate:"required"`
-	CPassword string `json:"cpassword" validate:"required"`
+	Name         string `json:"name" validate:"required"`
+	Email        string `json:"email" validate:"required,email"`
+	Password     string `json:"password" validate:"required"`
+	CPassword    string `json:"cpassword" validate:"required"`
+	ReferralCode string `json:"referralCode"`
 }
 
 // Register handles user registration
@@ -68,6 +70,11 @@ func (auth Auth) Register(ctx *fasthttp.RequestCtx) {
 			return
 		}
 
+		if param.ReferralCode != "" {
+			// Ignores error if any
+			defineReferralUser(tx, param.ReferralCode, user)
+		}
+
 		tx.Commit()
 		httpresponse.JSONOk(ctx, fasthttp.StatusCreated)
 		return
@@ -107,5 +114,23 @@ func createUserVerificationRequest(db *gorm.DB, user *models.User, p *registerBo
 		UserID:          user.ID,
 		Type:            "EMAIL",
 		VerificationKey: random.GetStr(100),
+	}).Error
+}
+
+func defineReferralUser(db *gorm.DB, code string, user *models.User) error {
+	var referralCode models.ReferralCode
+	if db.Preload("User").Where(&models.ReferralCode{
+		Code: code,
+	}).First(&referralCode).RecordNotFound() {
+		return fmt.Errorf("Invalid referral code")
+	}
+
+	if referralCode.User.BlockedAt != nil {
+		return fmt.Errorf("Referrer User Blocked")
+	}
+
+	return db.Create(&models.ReferralUser{
+		UserID:         user.ID,
+		ReferralCodeID: referralCode.ID,
 	}).Error
 }
