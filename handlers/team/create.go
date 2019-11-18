@@ -74,7 +74,7 @@ func (t Team) CreateTeam(sessionData *session.Data) func(*fasthttp.RequestCtx) {
 			return
 		}
 
-		httpresponse.JSONOk(ctx, fasthttp.StatusOK)
+		httpresponse.JSONErr(ctx, "Already created team", fasthttp.StatusBadRequest)
 		return
 	}
 }
