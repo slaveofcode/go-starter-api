@@ -59,8 +59,8 @@ func main() {
 
 	svr := &fasthttp.Server{
 		Handler: middleware.CORS(route.New(&context.AppContext{
-			DB:       db,
-			Sesssion: sess,
+			DB:      db,
+			Session: sess,
 		}).Handler),
 		LogAllErrors: true,
 		Logger:       log,
