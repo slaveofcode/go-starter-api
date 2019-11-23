@@ -3,12 +3,15 @@ package team
 import (
 	"encoding/json"
 
+	"github.com/jinzhu/gorm"
 	"github.com/slaveofcode/go-starter-api/lib/httpresponse"
 	"github.com/slaveofcode/go-starter-api/lib/session"
 	"github.com/slaveofcode/go-starter-api/repository/pg/models"
 	"github.com/valyala/fasthttp"
 	"gopkg.in/go-playground/validator.v9"
 )
+
+const allowHaveManyTeam = false
 
 type createTeamBodyParam struct {
 	Name string `json:"name" validate:"required"`
@@ -42,39 +45,89 @@ func (t Team) CreateTeam(sessionData *session.Data) func(*fasthttp.RequestCtx) {
 			return
 		}
 
-		var team models.Team
+		var teamMember models.TeamMember
 		if db.Where(&models.TeamMember{
 			UserID: sessionData.UserID,
 			RoleID: roleOwner.ID,
-		}).First(&team).RecordNotFound() {
+		}).First(&teamMember).RecordNotFound() {
 			tx := t.appCtx.DB.Begin()
-			// create team
-			createdTeam := new(models.Team)
-			if err := tx.Create(&models.Team{
-				Name: param.Name,
-			}).Scan(&createdTeam).Error; err != nil {
-				tx.Rollback()
+			err = createTeam(tx, param.Name, sessionData.UserID, roleOwner.ID)
+
+			if err != nil {
 				httpresponse.JSONErr(ctx, "Unable to create team: "+err.Error(), fasthttp.StatusInternalServerError)
 				return
 			}
 
-			// create team member as owner
-			if err = tx.Create(&models.TeamMember{
-				TeamID: createdTeam.ID,
-				UserID: sessionData.UserID,
-				RoleID: roleOwner.ID,
-			}).Error; err != nil {
-				tx.Rollback()
-				httpresponse.JSONErr(ctx, "Unable to create team: "+err.Error(), fasthttp.StatusInternalServerError)
-				return
-			}
-
-			tx.Commit()
 			httpresponse.JSONOk(ctx, fasthttp.StatusCreated)
 			return
 		}
 
-		httpresponse.JSONErr(ctx, "Already created team", fasthttp.StatusBadRequest)
+		// searching on team members already created
+		var allTeamMember []models.TeamMember
+		if err := db.Where(&models.TeamMember{
+			UserID: sessionData.UserID,
+			RoleID: roleOwner.ID,
+		}).Find(&allTeamMember).Error; err != nil {
+			httpresponse.JSONErr(ctx, "Unable to get member info: "+err.Error(), fasthttp.StatusInternalServerError)
+			return
+		}
+
+		var teamIds []uint
+		for _, member := range allTeamMember {
+			teamIds = append(teamIds, member.TeamID)
+		}
+
+		var teams []models.Team
+		if err = db.Where(teamIds).Find(&teams).Error; err != nil {
+			httpresponse.JSONErr(ctx, "Unable to get teams info: "+err.Error(), fasthttp.StatusInternalServerError)
+			return
+		}
+
+		for _, team := range teams {
+			if team.Name == param.Name {
+				httpresponse.JSONErr(ctx, "Already created team", fasthttp.StatusBadRequest)
+				return
+			}
+		}
+
+		if allowHaveManyTeam {
+			tx := t.appCtx.DB.Begin()
+			err = createTeam(tx, param.Name, sessionData.UserID, roleOwner.ID)
+
+			if err != nil {
+				httpresponse.JSONErr(ctx, "Unable to create team: "+err.Error(), fasthttp.StatusInternalServerError)
+				return
+			}
+
+			httpresponse.JSONOk(ctx, fasthttp.StatusCreated)
+			return
+		}
+
+		httpresponse.JSONErr(ctx, "You're not allowed to make more than one team", fasthttp.StatusBadRequest)
 		return
 	}
+}
+
+func createTeam(tx *gorm.DB, teamName string, userID, roleOwnerID uint) error {
+	// create team
+	createdTeam := new(models.Team)
+	if err := tx.Create(&models.Team{
+		Name: teamName,
+	}).Scan(&createdTeam).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// create team member as owner
+	if err := tx.Create(&models.TeamMember{
+		TeamID: createdTeam.ID,
+		UserID: userID,
+		RoleID: roleOwnerID,
+	}).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	tx.Commit()
+	return nil
 }
