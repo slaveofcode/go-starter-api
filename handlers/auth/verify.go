@@ -48,29 +48,51 @@ func (auth Auth) Verify(ctx *fasthttp.RequestCtx) {
 		Type:            param.Media,
 		VerificationKey: param.Token,
 	}).First(&userVerify).RecordNotFound() {
+		tx := db.Begin()
 		if userVerify.VerifiedAt != nil {
 			httpresponse.JSONOk(ctx, fasthttp.StatusOK)
 			return
 		}
 
 		t := time.Now()
-		err = db.Model(&userVerify).Updates(models.UserVerificationRequest{
+		err = tx.Model(&userVerify).Updates(models.UserVerificationRequest{
 			VerifiedAt: &t,
 		}).Error
 
 		if err != nil {
+			tx.Rollback()
 			httpresponse.JSONErr(ctx, "Unable to verify token: "+err.Error(), fasthttp.StatusInternalServerError)
 			return
 		}
 
-		if err := db.Create(&models.UserVerificationAttempt{
+		var user models.User
+		if tx.Where(&models.User{
+			ID: userVerify.UserID,
+		}).First(&user).RecordNotFound() {
+			tx.Rollback()
+			httpresponse.JSONErr(ctx, "User not found: "+err.Error(), fasthttp.StatusInternalServerError)
+			return
+		}
+
+		if err = tx.Model(&user).Updates(models.User{
+			VerifiedAt: &t,
+		}).Error; err != nil {
+			tx.Rollback()
+			httpresponse.JSONErr(ctx, "Unable to verify token: "+err.Error(), fasthttp.StatusInternalServerError)
+			return
+		}
+
+		if err := tx.Create(&models.UserVerificationAttempt{
 			UserID:                    userVerify.UserID,
 			UserVerificationRequestID: userVerify.ID,
 			UserAgent:                 string(ctx.UserAgent()),
 			IPAddr:                    ctx.RemoteAddr().String(),
 		}).Error; err != nil {
+			tx.Rollback()
 			logrus.Error("Unable to record verification attempt")
 		}
+
+		tx.Commit()
 
 		httpresponse.JSONOk(ctx, fasthttp.StatusOK)
 		return
