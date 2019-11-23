@@ -47,8 +47,6 @@ func (auth Auth) ForgotPassword(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	logrus.Info(cred.User.Name)
-
 	var resetCred models.ResetCredential
 	if db.Where(&models.ResetCredential{
 		CredentialID: cred.ID,
