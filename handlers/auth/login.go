@@ -21,14 +21,14 @@ type loginBodyParam struct {
 // Login handle login user and creates the session
 func (auth Auth) Login(ctx *fasthttp.RequestCtx) {
 	db := auth.appCtx.DB
-	store, err := auth.appCtx.Sesssion.Get(ctx)
+	store, err := auth.appCtx.Session.Get(ctx)
 
 	if err != nil {
 		ctx.Error("Internal server error: "+err.Error(), fasthttp.StatusInternalServerError)
 		return
 	}
 
-	defer auth.appCtx.Sesssion.Save(ctx, store)
+	defer auth.appCtx.Session.Save(ctx, store)
 
 	existingSess, err := authSession.GetAuth(store)
 
