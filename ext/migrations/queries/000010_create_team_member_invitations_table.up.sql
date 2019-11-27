@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS "TeamMemberInvitations" (
    email VARCHAR(60) NOT NULL,
    "roleId" INTEGER NOT NULL REFERENCES "Roles"(id),
    "invitationKey" VARCHAR(32) NOT NULL,
+   "visitedAt" TIMESTAMP WITH TIME ZONE NULL,
    "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL,
    "UpdatedAt" TIMESTAMP WITH TIME ZONE NOT NULL,
    "DeletedAt" TIMESTAMP WITH TIME ZONE NULL
@@ -13,6 +14,7 @@ CREATE INDEX "TeamMemberInvitations_teamId_idx" ON "TeamMemberInvitations" ("tea
 CREATE INDEX "TeamMemberInvitations_email_idx" ON "TeamMemberInvitations" ("email");
 CREATE INDEX "TeamMemberInvitations_roleId_idx" ON "TeamMemberInvitations" ("roleId");
 CREATE INDEX "TeamMemberInvitations_invitationKey_idx" ON "TeamMemberInvitations" ("invitationKey");
+CREATE INDEX "TeamMemberInvitations_verifiedAt_idx" ON "TeamMemberInvitations" ("visitedAt");
 
 CREATE INDEX "TeamMemberInvitations_CreatedAt_idx" ON "TeamMemberInvitations" ("CreatedAt");
 CREATE INDEX "TeamMemberInvitations_UpdatedAt_idx" ON "TeamMemberInvitations" ("UpdatedAt");
