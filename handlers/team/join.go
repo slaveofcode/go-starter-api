@@ -61,7 +61,32 @@ func (t Team) JoinTeam(sessionData *session.Data) func(*fasthttp.RequestCtx) {
 			RoleID: invitation.RoleID,
 		}).First(&member).RecordNotFound() {
 			// create team member
+			tx := db.Begin()
+
+			if err := tx.Create(&models.TeamMember{
+				TeamID: invitation.TeamID,
+				UserID: cred.User.ID,
+				RoleID: invitation.RoleID,
+			}).Error; err != nil {
+				tx.Rollback()
+				httpresponse.JSONErr(ctx, "Unable to process join: "+err.Error(), fasthttp.StatusInternalServerError)
+				return
+			}
+
 			// mark invitation as visited
+			now := time.Now()
+			if err = tx.Model(&invitation).Updates(models.TeamMemberInvitation{
+				VisitedAt: &now
+			}).Error; err != nil {
+				tx.Rollback()
+				httpresponse.JSONErr(ctx, "Unable to process join: "+err.Error(), fasthttp.StatusInternalServerError)
+				return
+			}
+
+			tx.Commit()
+
+			httpresponse.JSONOk(ctx, fasthttp.StatusOK)
+			return
 		}
 
 		httpresponse.JSONErr(ctx, "Already joined to the team", fasthttp.StatusBadRequest)
