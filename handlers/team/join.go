@@ -1,6 +1,7 @@
 package team
 
 import (
+	"time"
 	"encoding/json"
 
 	"github.com/slaveofcode/go-starter-api/lib/httpresponse"
@@ -76,7 +77,7 @@ func (t Team) JoinTeam(sessionData *session.Data) func(*fasthttp.RequestCtx) {
 			// mark invitation as visited
 			now := time.Now()
 			if err = tx.Model(&invitation).Updates(models.TeamMemberInvitation{
-				VisitedAt: &now
+				VisitedAt: &now,
 			}).Error; err != nil {
 				tx.Rollback()
 				httpresponse.JSONErr(ctx, "Unable to process join: "+err.Error(), fasthttp.StatusInternalServerError)
