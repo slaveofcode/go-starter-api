@@ -103,6 +103,7 @@ func createUser(db *gorm.DB, p *registerBodyParam) (*models.User, error) {
 
 	return &user, nil
 }
+
 func createCredential(db *gorm.DB, user *models.User, p *registerBodyParam) error {
 	hashed, err := password.Hash(p.Password)
 
