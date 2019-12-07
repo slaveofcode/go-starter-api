@@ -38,6 +38,8 @@ func New(appCtx *context.AppContext) *router.Router {
 
 	// Team Handlers
 	teamHandlers := team.NewTeam(appCtx)
+	router.GET("/teams",
+		middleware.AuthenticatedUser(appCtx, teamHandlers.Members))
 	router.POST("/teams/create",
 		middleware.AuthenticatedUser(appCtx, teamHandlers.CreateTeam))
 	router.POST("/teams/invite",
