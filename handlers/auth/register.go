@@ -145,18 +145,7 @@ func defineReferralUser(db *gorm.DB, code string, user *models.User) error {
 }
 
 func generateMailVerifyTpl(name, token string) (string, string) {
-	webBaseURL := os.Getenv("WEB_BASE_URL")
-	h := hermes.Hermes{
-		// Optional Theme
-		// Theme: new(Default)
-		Product: hermes.Product{
-			// Appears in header & footer of e-mails
-			Name: "Ayok.be",
-			Link: webBaseURL,
-			// Optional product logo
-			Logo: os.Getenv("MAIL_LOGO_IMG_URL"),
-		},
-	}
+	h := mail.GetHermes()
 
 	email := hermes.Email{
 		Body: hermes.Body{
@@ -170,7 +159,7 @@ func generateMailVerifyTpl(name, token string) (string, string) {
 					Button: hermes.Button{
 						Color: "#22BC66", // Optional action button color
 						Text:  "Verify My Account",
-						Link:  webBaseURL + "/verify?token=" + token,
+						Link:  os.Getenv("SITE_NAME") + "/verify?token=" + token,
 					},
 				},
 			},
