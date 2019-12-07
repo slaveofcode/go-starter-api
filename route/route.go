@@ -46,8 +46,6 @@ func New(appCtx *context.AppContext) *router.Router {
 		middleware.AuthenticatedUser(appCtx, teamHandlers.JoinTeam))
 	router.POST("/teams/change-role",
 		middleware.AuthenticatedUser(appCtx, teamHandlers.ChangeMemberRole))
-	router.POST("/teams/freeze-member",
-		middleware.AuthenticatedUser(appCtx, teamHandlers.FreezeMember))
 
 	return router
 }

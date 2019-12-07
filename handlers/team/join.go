@@ -1,8 +1,8 @@
 package team
 
 import (
-	"time"
 	"encoding/json"
+	"time"
 
 	"github.com/slaveofcode/go-starter-api/lib/httpresponse"
 	"github.com/slaveofcode/go-starter-api/lib/session"
