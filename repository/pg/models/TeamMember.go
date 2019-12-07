@@ -6,10 +6,13 @@ import (
 
 // TeamMember model gorm
 type TeamMember struct {
-	ID        uint       `gorm:"primary_key"`
-	TeamID    uint       `gorm:"column:teamId" sql:"index"`
-	UserID    uint       `gorm:"column:userId" sql:"index"`
-	RoleID    uint       `gorm:"column:roleId" sql:"index"`
+	ID        uint `gorm:"primary_key"`
+	TeamID    uint `gorm:"column:teamId" sql:"index"`
+	Team      Team
+	UserID    uint `gorm:"column:userId" sql:"index"`
+	User      User
+	RoleID    uint `gorm:"column:roleId" sql:"index"`
+	Role      Role
 	IsFrozen  bool       `gorm:"column:isFrozen" sql:"index"`
 	CreatedAt time.Time  `gorm:"column:CreatedAt" sql:"index"`
 	UpdatedAt time.Time  `gorm:"column:UpdatedAt" sql:"index"`

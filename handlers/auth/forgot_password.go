@@ -47,8 +47,6 @@ func (auth Auth) ForgotPassword(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	logrus.Info(cred.User.Name)
-
 	var resetCred models.ResetCredential
 	if db.Where(&models.ResetCredential{
 		CredentialID: cred.ID,
@@ -60,7 +58,7 @@ func (auth Auth) ForgotPassword(ctx *fasthttp.RequestCtx) {
 			return
 		}
 
-		sendEmail(cred.User.Name, cred.Email, rec.ResetToken)
+		sendEmailForgotPassword(cred.User.Name, cred.Email, rec.ResetToken)
 
 		httpresponse.JSONOk(ctx, fasthttp.StatusOK)
 		return
@@ -85,7 +83,7 @@ func (auth Auth) ForgotPassword(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	sendEmail(cred.User.Name, cred.Email, rec.ResetToken)
+	sendEmailForgotPassword(cred.User.Name, cred.Email, rec.ResetToken)
 
 	httpresponse.JSONOk(ctx, fasthttp.StatusOK)
 	return
@@ -107,7 +105,7 @@ func createResetCredential(db *gorm.DB, cred *models.Credential) (*models.ResetC
 	return &reset, nil
 }
 
-func generateMailTpl(name, token string) (string, string) {
+func generateMailForgotTpl(name, token string) (string, string) {
 	webBaseURL := os.Getenv("WEB_BASE_URL")
 	h := hermes.Hermes{
 		// Optional Theme
@@ -158,8 +156,8 @@ func generateMailTpl(name, token string) (string, string) {
 	return emailBody, emailText
 }
 
-func sendEmail(name, email, token string) error {
-	msgHTML, msgText := generateMailTpl(name, token)
+func sendEmailForgotPassword(name, email, token string) error {
+	msgHTML, msgText := generateMailForgotTpl(name, token)
 	out, err := mail.Send(&mail.Template{
 		From: os.Getenv("SES_FROM_EMAIL"),
 		Recipients: []*string{

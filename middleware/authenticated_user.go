@@ -14,7 +14,7 @@ type SessionRequestHandler func(sessData *session.Data) func(ctx *fasthttp.Reque
 // AuthenticatedUser provides authentication checking for user by identifying the session
 func AuthenticatedUser(appCtx *context.AppContext, requestHandler SessionRequestHandler) fasthttp.RequestHandler {
 	return func(ctx *fasthttp.RequestCtx) {
-		store, err := appCtx.Sesssion.Get(ctx)
+		store, err := appCtx.Session.Get(ctx)
 
 		if err != nil {
 			httpresponse.JSONErr(ctx, "Internal server error: "+err.Error(), fasthttp.StatusInternalServerError)

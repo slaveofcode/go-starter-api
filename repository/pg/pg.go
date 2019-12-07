@@ -1,22 +1,30 @@
 package pg
 
 import (
-	"os"
-
 	"github.com/jinzhu/gorm"
 	// import specific dialect for postgres
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	log "github.com/sirupsen/logrus"
 )
 
+// Connection info
+type Connection struct {
+	Host     string
+	Port     string
+	Username string
+	Password string
+	DBName   string
+	SSL      bool
+}
+
 // NewConnection creates new connection instance
-func NewConnection() *gorm.DB {
-	host := os.Getenv("PG_HOST")
-	port := os.Getenv("PG_PORT")
-	user := os.Getenv("PG_USER")
-	pass := os.Getenv("PG_PASS")
-	dbname := os.Getenv("PG_DBNAME")
-	dsnString := "host=" + host + " port=" + port + " user=" + user + " dbname=" + dbname + " password=" + pass + " sslmode=disable"
+func NewConnection(conn *Connection) *gorm.DB {
+	sslmode := "sslmode=disable"
+	if conn.SSL {
+		sslmode = "sslmode=enable"
+	}
+
+	dsnString := "host=" + conn.Host + " port=" + conn.Port + " user=" + conn.Username + " dbname=" + conn.DBName + " password=" + conn.Password + " " + sslmode
 	log.Info("PG DSN:" + dsnString)
 	db, err := gorm.Open("postgres", dsnString)
 

@@ -5,6 +5,7 @@ import (
 	"github.com/slaveofcode/go-starter-api/context"
 	"github.com/slaveofcode/go-starter-api/handlers"
 	"github.com/slaveofcode/go-starter-api/handlers/auth"
+	"github.com/slaveofcode/go-starter-api/handlers/team"
 	"github.com/slaveofcode/go-starter-api/handlers/user"
 	"github.com/slaveofcode/go-starter-api/middleware"
 )
@@ -34,6 +35,19 @@ func New(appCtx *context.AppContext) *router.Router {
 	router.POST("/users/make-referral-code",
 		middleware.AuthenticatedUser(appCtx, userHandlers.MakeReferral),
 	)
+
+	// Team Handlers
+	teamHandlers := team.NewTeam(appCtx)
+	router.GET("/teams",
+		middleware.AuthenticatedUser(appCtx, teamHandlers.Members))
+	router.POST("/teams/create",
+		middleware.AuthenticatedUser(appCtx, teamHandlers.CreateTeam))
+	router.POST("/teams/invite",
+		middleware.AuthenticatedUser(appCtx, teamHandlers.InviteMember))
+	router.POST("/teams/join",
+		middleware.AuthenticatedUser(appCtx, teamHandlers.JoinTeam))
+	router.POST("/teams/change-role",
+		middleware.AuthenticatedUser(appCtx, teamHandlers.ChangeMemberRole))
 
 	return router
 }

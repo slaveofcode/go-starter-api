@@ -21,14 +21,27 @@ type loginBodyParam struct {
 // Login handle login user and creates the session
 func (auth Auth) Login(ctx *fasthttp.RequestCtx) {
 	db := auth.appCtx.DB
-	store, err := auth.appCtx.Sesssion.Get(ctx)
+	store, err := auth.appCtx.Session.Get(ctx)
 
 	if err != nil {
 		ctx.Error("Internal server error: "+err.Error(), fasthttp.StatusInternalServerError)
 		return
 	}
 
-	defer auth.appCtx.Sesssion.Save(ctx, store)
+	defer auth.appCtx.Session.Save(ctx, store)
+
+	var param loginBodyParam
+
+	if err := json.Unmarshal(ctx.PostBody(), &param); err != nil {
+		httpresponse.JSONErr(ctx, "Wrong post data: "+err.Error(), fasthttp.StatusBadRequest)
+		return
+	}
+
+	v := validator.New()
+	if err := v.Struct(param); err != nil {
+		httpresponse.JSONErr(ctx, "Invalid post data: "+err.Error(), fasthttp.StatusBadRequest)
+		return
+	}
 
 	existingSess, err := authSession.GetAuth(store)
 
@@ -45,23 +58,10 @@ func (auth Auth) Login(ctx *fasthttp.RequestCtx) {
 
 	if existingSess != nil {
 		userSess := existingSess.(authSession.Data)
-		if userSess.UserID != 0 {
+		if userSess.UserID != 0 && userSess.Email == param.Email {
 			httpresponse.JSONOk(ctx, fasthttp.StatusOK)
 			return
 		}
-	}
-
-	var param loginBodyParam
-
-	if err := json.Unmarshal(ctx.PostBody(), &param); err != nil {
-		httpresponse.JSONErr(ctx, "Wrong post data: "+err.Error(), fasthttp.StatusBadRequest)
-		return
-	}
-
-	v := validator.New()
-	if err := v.Struct(param); err != nil {
-		httpresponse.JSONErr(ctx, "Invalid post data: "+err.Error(), fasthttp.StatusBadRequest)
-		return
 	}
 
 	var cred models.Credential
@@ -81,6 +81,11 @@ func (auth Auth) Login(ctx *fasthttp.RequestCtx) {
 	if db.Where(&models.User{
 		ID: cred.UserID,
 	}).First(&user).RecordNotFound() {
+		httpresponse.JSONErr(ctx, "User not found", fasthttp.StatusBadRequest)
+		return
+	}
+
+	if user.VerifiedAt == nil {
 		httpresponse.JSONErr(ctx, "User not verified", fasthttp.StatusBadRequest)
 		return
 	}

@@ -8,6 +8,7 @@ import (
 	"github.com/fasthttp/session"
 	"github.com/fasthttp/session/redis"
 	"github.com/joho/godotenv"
+	"github.com/sirupsen/logrus"
 	"github.com/slaveofcode/go-starter-api/context"
 	"github.com/slaveofcode/go-starter-api/logger"
 	"github.com/slaveofcode/go-starter-api/middleware"
@@ -16,13 +17,17 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
-var log = logger.New()
-
 // sess handles the user session
 var sess = session.New(session.NewDefaultConfig())
 
 func init() {
-	loadEnv()
+	err := godotenv.Load()
+	if err != nil {
+		logrus.Fatal("Error loading .env file")
+	}
+
+	logger.Setup()
+
 	// Session
 	redisPort, _ := strconv.ParseInt(os.Getenv("REDIS_PORT"), 10, 64)
 	sessCfg := &redis.Config{
@@ -32,18 +37,11 @@ func init() {
 		IdleTimeout: 300,
 		KeyPrefix:   "sess",
 	}
-	err := sess.SetProvider("redis", sessCfg)
+	err = sess.SetProvider("redis", sessCfg)
 	if err != nil {
 		fmt.Println("Unable to intialize sesion with redis: ", err.Error())
 	}
 	fmt.Println("Session initialized...")
-}
-
-func loadEnv() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
 }
 
 func main() {
@@ -54,21 +52,32 @@ func main() {
 	}
 
 	// Database initialization
-	db := pg.NewConnection()
+	// host := os.Getenv("PG_HOST")
+	// port := os.Getenv("PG_PORT")
+	// user := os.Getenv("PG_USER")
+	// pass := os.Getenv("PG_PASS")
+	// dbname := os.Getenv("PG_DBNAME")
+	db := pg.NewConnection(&pg.Connection{
+		Host:     os.Getenv("PG_HOST"),
+		Port:     os.Getenv("PG_PORT"),
+		Username: os.Getenv("PG_USER"),
+		Password: os.Getenv("PG_PASS"),
+		DBName:   os.Getenv("PG_DBNAME"),
+	})
 	defer db.Close()
 
 	svr := &fasthttp.Server{
 		Handler: middleware.CORS(route.New(&context.AppContext{
-			DB:       db,
-			Sesssion: sess,
+			DB:      db,
+			Session: sess,
 		}).Handler),
 		LogAllErrors: true,
-		Logger:       log,
+		Logger:       &logrus.Logger{},
 	}
 
-	log.Info("Server Running on http://localhost:" + port)
+	logrus.Info("Server Running on http://localhost:" + port)
 
 	if err := svr.ListenAndServe(":" + port); err != nil {
-		log.Fatalf("error in ListenAndServe: %s", err)
+		logrus.Fatalf("error in ListenAndServe: %s", err)
 	}
 }

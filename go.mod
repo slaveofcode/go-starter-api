@@ -20,6 +20,7 @@ require (
 	github.com/klauspost/compress v1.9.0 // indirect
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/leodido/go-urn v1.2.0 // indirect
+	github.com/lib/pq v1.1.1
 	github.com/matcornic/hermes v1.2.0
 	github.com/matcornic/hermes/v2 v2.0.2 // indirect
 	github.com/mattn/go-runewidth v0.0.5 // indirect
