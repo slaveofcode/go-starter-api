@@ -34,8 +34,8 @@ func (t Subscription) StartPlan(sessionData *session.Data) func(*fasthttp.Reques
 			return
 		}
 
-		if param.Plan != PlanFree || param.Plan != PlanStarter || param.Plan != PlanPremium {
-			httpresponse.JSONErr(ctx, "Invalid Plan: ", fasthttp.StatusBadRequest)
+		if IsValidPlan(param.Plan) {
+			httpresponse.JSONErr(ctx, "Invalid Plan: "+param.Plan, fasthttp.StatusBadRequest)
 			return
 		}
 

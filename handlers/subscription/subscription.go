@@ -11,6 +11,23 @@ const (
 	PlanPremium = "PLAN_PREMIUM"
 )
 
+// IsValidPlan will validate plan
+func IsValidPlan(plan string) bool {
+	if plan == PlanFree {
+		return true
+	}
+
+	if plan == PlanStarter {
+		return true
+	}
+
+	if plan == PlanPremium {
+		return true
+	}
+
+	return false
+}
+
 // Subscription handler
 type Subscription struct {
 	appCtx *context.AppContext
