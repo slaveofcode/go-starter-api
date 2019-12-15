@@ -53,9 +53,7 @@ func (t Subscription) StopPlan(sessionData *session.Data) func(*fasthttp.Request
 		}
 
 		if currSub.IsRecurring {
-			if err = db.Model(&currSub).Updates(&models.Subscription{
-				IsRecurring: false,
-			}).Error; err != nil {
+			if err = db.Model(&currSub).Update("isRecurring", false).Error; err != nil {
 				httpresponse.JSONErr(ctx, "Unable to stop existing plan: "+err.Error(), fasthttp.StatusBadRequest)
 				return
 			}

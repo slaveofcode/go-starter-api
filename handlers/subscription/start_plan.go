@@ -42,15 +42,12 @@ func (t Subscription) StartPlan(sessionData *session.Data) func(*fasthttp.Reques
 		db := t.appCtx.DB
 
 		var currSub models.Subscription
-		if err := db.Where(&models.Subscription{
+		db.Where(&models.Subscription{
 			UserID:   sessionData.UserID,
 			PlanType: param.Plan,
-		}).First(&currSub).Error; err != nil {
-			httpresponse.JSONErr(ctx, "Unable to check existing plan: "+err.Error(), fasthttp.StatusBadRequest)
-			return
-		}
+		}).First(&currSub)
 
-		if currSub.ID != 0 && currSub.EndOfPlanAt.Before(time.Now()) {
+		if currSub.ID == 0 || (currSub.ID != 0 && currSub.EndOfPlanAt.Before(time.Now())) {
 			// create new plan
 			if err = db.Create(&models.Subscription{
 				UserID:      sessionData.UserID,

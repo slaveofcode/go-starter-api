@@ -28,6 +28,54 @@ func IsValidPlan(plan string) bool {
 	return false
 }
 
+func PlanToHuman(plan string) string {
+	if plan == PlanFree {
+		return "Free Plan"
+	}
+
+	if plan == PlanStarter {
+		return "Starter Plan"
+	}
+
+	if plan == PlanPremium {
+		return "Premium Plan"
+	}
+
+	return ""
+}
+
+func PlanDescriptionToHuman(plan string) string {
+	if plan == PlanFree {
+		return "Go Starter - Free Plan Subscription"
+	}
+
+	if plan == PlanStarter {
+		return "Go Starter - Starter Plan Subscription"
+	}
+
+	if plan == PlanPremium {
+		return "Go Starter - Premium Plan Subscription"
+	}
+
+	return ""
+}
+
+func PlanToPriceUSD(plan string) int64 {
+	if plan == PlanFree {
+		return 0
+	}
+
+	if plan == PlanStarter {
+		return 50
+	}
+
+	if plan == PlanPremium {
+		return 100
+	}
+
+	return 100
+}
+
 // Subscription handler
 type Subscription struct {
 	appCtx *context.AppContext
