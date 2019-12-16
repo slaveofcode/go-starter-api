@@ -54,8 +54,8 @@ func New(appCtx *context.AppContext) *router.Router {
 	subsHandlers := subscription.NewSubscription(appCtx)
 	router.GET("/subs/current",
 		middleware.AuthenticatedUser(appCtx, subsHandlers.CurrentPlan))
-	router.POST("/subs/get-invoice",
-		middleware.AuthenticatedUser(appCtx, subsHandlers.DownloadInvoice))
+	router.POST("/subs/request-invoice",
+		middleware.AuthenticatedUser(appCtx, subsHandlers.RequestInvoice))
 	router.POST("/subs/start",
 		middleware.AuthenticatedUser(appCtx, subsHandlers.StartPlan))
 	router.POST("/subs/stop",
